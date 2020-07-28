@@ -17,14 +17,55 @@ A simple django application to manage photos
 - Implement batch upload, edit, delete, publish API for photos
 - Support #tags in captions, and filtering on the same
 
-Photo
 
-All endpoint need to be authenticated using jwt
+## Requirement
 
+1. Python 3.8.5 with virtualenv, can be installed using [pyenv](https://github.com/pyenv/pyenv)
+2. Docker 18.09.5
+3. Docker compose 1.25.4
+
+### Development
+
+This step is required for enabling code completion on vscode.
+
+```
+# Check python version, required 3.8.5
+python --version
+Python 3.8.5
+
+# Create virtualenv
+virtualenv -p `which python` .venv
+source .venv/bin/activate
+
+# Install dependencies
+pip install -r src/requirements.txt
+
+# Import environment variables
+cd src
+export $(cat .env.dev | xargs)
+
+# Test django installation
+python manage.py runserver
+```
+
+Now the local is fine, let's prepare for a dockerize environment.
+
+```
+# Start (with daemon mode add `-d`) or build (add `--build`) the docker images
+docker-compose up
+```
+
+## API
+
+### Photo
+
+> All endpoint need to be authenticated using jwt
+
+```
 POST /auth
 return access_token & refresh_token
 
-GET /photos 
+GET /photos
     /photos/{id}
     /photos/me
     /photos/drafts
@@ -38,12 +79,4 @@ return id
 
 DELETE /photos/{id}
 return id
-
-
-### Development
-```
-docker run --rm -it \
-  -v $PWD/src:/root/src \
-  -p 8000:8000 \
-  django-photos bash
 ```
