@@ -1,0 +1,13 @@
+version: '3.7'
+
+services:
+  web:
+    restart: always
+    build: .
+    command: gunicorn djangophotos.wsgi:application -w 2 -b :8000 --reload
+    volumes:
+      - ./src/:/root/src/
+    ports:
+      - 8000:8000
+    env_file:
+      - ./src/.env.dev
