@@ -26,14 +26,14 @@ A simple django application to manage photos
 
 ### Development
 
-This step is required for enabling code completion on vscode.
+This step is required for enabling code completion on vscode. Can skip if not needed.
 
 ```
 # Check python version, required 3.8.5
 python --version
 Python 3.8.5
 
-# Create virtualenv
+# Create virtualenv and activate
 virtualenv -p `which python` .venv
 source .venv/bin/activate
 
@@ -54,6 +54,8 @@ Now the local is fine, let's prepare for a dockerize environment.
 # Start (with daemon mode add `-d`) or build (add `--build`) the docker images
 docker-compose up
 ```
+
+The docker environment is supported for auto reload.
 
 ## API
 
