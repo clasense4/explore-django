@@ -57,6 +57,23 @@ docker-compose up
 
 The docker environment is supported for auto reload.
 
+### Tests
+
+On local, use the commands below
+
+```
+cd src && python manage.py test photos
+```
+
+On docker running, use the commands below
+
+```
+# Check docker name
+$(docker ps | grep django | awk '{print $12}')
+# Execute test inside docker
+docker exec -it $(docker ps | grep django | awk '{print $12}') python manage.py test photos
+```
+
 ## API
 
 ### Photo
