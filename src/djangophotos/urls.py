@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from django.conf.urls import url, include
 from django.contrib.auth.models import User
 from rest_framework import routers, serializers, viewsets
+from rest_framework_jwt.views import obtain_jwt_token
 
 # Serializers define the API representation.
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -40,5 +41,6 @@ urlpatterns = [
     # path('', include('photos.urls')),
     path('admin/', admin.site.urls),
     url(r'^', include(router.urls)),
-    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^api-token-auth/', obtain_jwt_token),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
