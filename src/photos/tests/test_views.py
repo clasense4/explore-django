@@ -165,5 +165,34 @@ class RegisterUserTests(TestCase):
             '{"foo"}',
             format='json'
         )
-        print(response.data)
         self.assertIs(status.is_client_error(response.status_code), True)
+
+    def test_07_delete_photo(self):
+        # Post a new published photo
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
+        with open('photos/tests/sapi.jpg', 'rb') as fp:
+            response = client.post(
+                BASE_URL + 'photo/',
+                {
+                    'name': 'sapi australia',
+                    'file': fp,
+                    'captions': 'Sapi australia #sapi',
+                    'status': 'p',
+                },
+                format='multipart'
+            )
+        obj_id = response.data['id']
+        self.assertIs(status.is_success(response.status_code), True)
+
+        # Delete the photo
+        response = client.delete(
+            BASE_URL + 'photo/' + str(obj_id) + '/'
+        )
+        self.assertIs(status.is_success(response.status_code), True)
+
+        # Get deleted photo
+        response = client.get(
+            BASE_URL + 'photo/' + str(obj_id) + '/'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
