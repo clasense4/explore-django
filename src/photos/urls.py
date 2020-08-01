@@ -1,7 +1,10 @@
 from django.urls import path
-
-from . import views
+from rest_framework.urlpatterns import format_suffix_patterns
+from photos import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('api/v1/photo/', views.PhotoList.as_view()),
+    path('api/v1/photo/<int:pk>/', views.PhotoDetail.as_view()),
 ]
+
+urlpatterns = format_suffix_patterns(urlpatterns)
