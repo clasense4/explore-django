@@ -5,7 +5,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 
 client = APIClient()
-
+BASE_URL = '/api/v1/'
 
 class RegisterUserTests(TestCase):
 
@@ -34,7 +34,7 @@ class RegisterUserTests(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
         response = client.get(
-            '/api/v1/photo/'
+            BASE_URL + 'photo/'
         )
         photo_count = len(response.data)
         self.assertIs(status.is_success(response.status_code), True)
@@ -46,7 +46,7 @@ class RegisterUserTests(TestCase):
         client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
         with open('photos/tests/sapi.jpg', 'rb') as fp:
             response = client.post(
-                '/api/v1/photo/',
+                BASE_URL + 'photo/',
                 {
                     'name': 'sapi australia',
                     'file': fp,
@@ -60,7 +60,7 @@ class RegisterUserTests(TestCase):
 
         # Get all photo
         response = client.get(
-            '/api/v1/photo/'
+            BASE_URL + 'photo/'
         )
         photo_count = len(response.data)
         self.assertIs(status.is_success(response.status_code), True)
@@ -68,7 +68,7 @@ class RegisterUserTests(TestCase):
 
         # Get individual photo
         response = client.get(
-            '/api/v1/photo/' + str(obj_id) + '/'
+            BASE_URL + 'photo/' + str(obj_id) + '/'
         )
         self.assertIs(status.is_success(response.status_code), True)
 
@@ -78,7 +78,7 @@ class RegisterUserTests(TestCase):
         client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
         with open('photos/tests/sapi.jpg', 'rb') as fp:
             response = client.post(
-                '/api/v1/photo/',
+                BASE_URL + 'photo/',
                 {
                     'name': 'sapi australia',
                     'file': fp,
@@ -99,7 +99,7 @@ class RegisterUserTests(TestCase):
         client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
         with open('photos/tests/sapi.jpg', 'rb') as fp:
             response = client.post(
-                '/api/v1/photo/',
+                BASE_URL + 'photo/',
                 {
                     'file': fp,
                     'captions': 'Sapi australia #sapi',
@@ -107,4 +107,13 @@ class RegisterUserTests(TestCase):
                 format='multipart'
             )
         self.assertIs(status.is_client_error(response.status_code), True)
+
+    def test_05_unknown_photo_id(self):
+        # Photo is not found
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
+        response = client.get(
+            BASE_URL + 'photo/qweasdzxc/'
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
