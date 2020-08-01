@@ -117,3 +117,53 @@ class RegisterUserTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
+    def test_06_update_captions(self):
+        # Post a new published photo
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
+        with open('photos/tests/sapi.jpg', 'rb') as fp:
+            response = client.post(
+                BASE_URL + 'photo/',
+                {
+                    'name': 'sapi australia',
+                    'file': fp,
+                    'captions': 'Sapi australia #sapi',
+                    'status': 'p',
+                },
+                format='multipart'
+            )
+        obj_id = response.data['id']
+        self.assertIs(status.is_success(response.status_code), True)
+
+        # Update the captions
+        captions = 'Sapi bandung #sapi'
+        response = client.put(
+            BASE_URL + 'photo/' + str(obj_id) + '/',
+            {
+                'captions': captions,
+            },
+            format='json'
+        )
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertEqual(captions, response.data['captions'])
+
+        # Update other field than captions
+        error_message = 'only allow captions'
+        response = client.put(
+            BASE_URL + 'photo/' + str(obj_id) + '/',
+            {
+                'name': 'sapi bandung',
+            },
+            format='json'
+        )
+        self.assertIs(status.is_client_error(response.status_code), True)
+        self.assertEqual(error_message, response.data['error'])
+
+        # Bad request
+        response = client.put(
+            BASE_URL + 'photo/' + str(obj_id) + '/',
+            '{"foo"}',
+            format='json'
+        )
+        print(response.data)
+        self.assertIs(status.is_client_error(response.status_code), True)
