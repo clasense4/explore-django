@@ -67,3 +67,9 @@ class PhotoDetail(APIView):
             else:
                 return Response({'detail': 'only allow captions'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk, format=None):
+        Photo = self.get_object(pk)
+        Photo.delete()
+        # Delete media?
+        return Response(status=status.HTTP_204_NO_CONTENT)
