@@ -329,3 +329,79 @@ class PhotoTests(TestCase):
         photo_count = len(response.data)
         self.assertIs(status.is_success(response.status_code), True)
         self.assertIs(photo_count, 1)
+
+    def test_09_hashtag_search(self):
+        # Register and login the 2nd user
+        response = client.post(
+            '/registration/',
+            {'username':'fajriTest2','password1':'passwordfajriTest2','password2':'passwordfajriTest2'},
+            format='json'
+        )
+        client2 = APIClient()
+        client2.credentials(HTTP_AUTHORIZATION='JWT ' + response.data['token'])
+
+        # Publish 1 photo with caption "Cool saltwater fish #nemo #aquarium #fishtank"
+        with open('photos/tests/nemo.jpg', 'rb') as fp:
+            response = client2.post(
+                BASE_URL + 'photos',
+                {
+                    'name': 'Anemone fish in aquariums',
+                    'file': fp,
+                    'captions': 'Cool saltwater fish #nemo #aquarium #fishtank',
+                    'status': 'p',
+                },
+                format='multipart'
+            )
+        published_at = response.data['published_at']
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertNotEqual(published_at, None)
+
+        # Publish 1 photo with caption "Semi black clownfish #clownfish #aquarium #bluetang"
+        with open('photos/tests/nemo.jpg', 'rb') as fp:
+            response = client2.post(
+                BASE_URL + 'photos',
+                {
+                    'name': 'Nemo and Dory',
+                    'file': fp,
+                    'captions': 'Semi black clownfish #clownfish #aquarium #bluetang',
+                    'status': 'p',
+                },
+                format='multipart'
+            )
+        published_at = response.data['published_at']
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertNotEqual(published_at, None)
+
+        # Seach for hashtag #nemo should return 1 result
+        response = client2.post(
+            BASE_URL + 'photos/hashtag',
+            {'search':'#nemo'},
+            format='json'
+        )
+        photo_count = len(response.data)
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertIs(photo_count, 1)
+
+        # Seach for hashtag #aquarium should return 2 result
+        response = client2.post(
+            BASE_URL + 'photos/hashtag',
+            {'search':'#aquarium'},
+            format='json'
+        )
+        photo_count = len(response.data)
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertIs(photo_count, 2)
+
+        # login the 1st user
+        client1 = APIClient()
+        client1.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
+
+        # Seach for hashtag #aquarium should return 2 result
+        response = client1.post(
+            BASE_URL + 'photos/hashtag',
+            {'search':'#aquarium'},
+            format='json'
+        )
+        photo_count = len(response.data)
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertIs(photo_count, 2)

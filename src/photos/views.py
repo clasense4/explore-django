@@ -123,3 +123,17 @@ class UserList(APIView):
         user_photos = Photo.objects.filter(user=user.id, status='p')
         serializer = UserPhotoSerializer(user_photos, many=True, context={'request': request})
         return Response(serializer.data)
+
+
+class PhotoHashtagList(APIView):
+    """
+    List all published photos by user.
+    """
+    permission_classes = [
+        permissions.IsAuthenticated
+    ]
+
+    def post(self, request, format=None):
+        user_photos = Photo.objects.filter(status='p', captions__search=request.data['search'])
+        serializer = UserPhotoSerializer(user_photos, many=True, context={'request': request})
+        return Response(serializer.data)

@@ -5,6 +5,7 @@ from photos import views
 
 urlpatterns = [
     path('api/v1/photos', views.PhotoList.as_view()),
+    path('api/v1/photos/hashtag', views.PhotoHashtagList.as_view()),
     path('api/v1/photo/<int:pk>', views.PhotoDetail.as_view()),
     path('api/v1/user/<str:username>', views.UserList.as_view()),
 ]
