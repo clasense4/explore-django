@@ -16,5 +16,8 @@ docker-compose --version
 cd /home/ubuntu
 git clone https://github.com/clasense4/explore-django.git
 cd explore-django
-sudo docker-compose up -d --build
+export ec2_public_hostname=$(curl http://169.254.169.254/latest/meta-data/public-hostname)
+echo "DJANGO_ALLOWED_HOSTS=$ec2_public_hostname" | sudo tee -a src/.env.prod >/dev/null
+sudo cat src/.env.prod
+sudo docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
 sudo docker exec -it explore-django_web_1 python manage.py migrate
