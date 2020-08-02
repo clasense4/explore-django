@@ -290,9 +290,41 @@ class RegisterUserTests(TestCase):
         self.assertIs(status.is_success(response.status_code), True)
         self.assertIs(photo_count, 1)
 
-        # Get all photos, must return 1 record
+        # Get all draft photos, must return 1 record
         response = client.get(
             BASE_URL + 'photos?status=d'
+        )
+        photo_count = len(response.data)
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertIs(photo_count, 1)
+
+        # Get all photos sort asc
+        response = client.get(
+            BASE_URL + 'photos?sort=asc'
+        )
+        photo_count = len(response.data)
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertIs(photo_count, 2)
+
+        # Get all photos sort desc
+        response = client.get(
+            BASE_URL + 'photos?sort=desc'
+        )
+        photo_count = len(response.data)
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertIs(photo_count, 2)
+
+        # Get all published photo with sort, must return 1 record
+        response = client.get(
+            BASE_URL + 'photos?status=p&sort=asc'
+        )
+        photo_count = len(response.data)
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertIs(photo_count, 1)
+
+        # Get all draft photos with sort, must return 1 record
+        response = client.get(
+            BASE_URL + 'photos?status=d&sort=desc'
         )
         photo_count = len(response.data)
         self.assertIs(status.is_success(response.status_code), True)

@@ -27,6 +27,14 @@ class PhotoList(APIView):
             photos = Photo.objects.filter(user=request.user.id, status=photo_status)
         else:
             photos = Photo.objects.filter(user=request.user.id)
+
+        # Filter by query params | ?sort=asc/desc
+        allowed_sort = ['asc', 'desc']
+        sort = request.query_params.get('sort', None)
+        if sort in allowed_sort:
+            column = 'published_at' if sort == 'asc' else '-published_at'
+            photos = photos.order_by(column)
+
         photo_serializer = PhotoSerializer(photos, many=True, context={'request': request})
         return Response(photo_serializer.data, status=status.HTTP_200_OK)
 
