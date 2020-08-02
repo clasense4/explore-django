@@ -68,7 +68,7 @@ class RegisterUserTests(TestCase):
 
         # Get individual photo
         response = client.get(
-            BASE_URL + 'photo/' + str(obj_id) + '/'
+            BASE_URL + 'photo/' + str(obj_id)
         )
         self.assertIs(status.is_success(response.status_code), True)
 
@@ -138,7 +138,7 @@ class RegisterUserTests(TestCase):
         # Update the captions
         captions = 'Sapi bandung #sapi'
         response = client.put(
-            BASE_URL + 'photo/' + str(obj_id) + '/',
+            BASE_URL + 'photo/' + str(obj_id),
             {
                 'captions': captions,
             },
@@ -150,7 +150,7 @@ class RegisterUserTests(TestCase):
         # Publish from draft
         photo_status = 'd' #draft
         response = client.put(
-            BASE_URL + 'photo/' + str(obj_id) + '/',
+            BASE_URL + 'photo/' + str(obj_id),
             {
                 'status': photo_status,
             },
@@ -163,7 +163,7 @@ class RegisterUserTests(TestCase):
         photo_status = 'p' #draft
         captions = 'Sapi bandung juara #sapi #juara'
         response = client.put(
-            BASE_URL + 'photo/' + str(obj_id) + '/',
+            BASE_URL + 'photo/' + str(obj_id),
             {
                 'captions': captions,
                 'status': photo_status,
@@ -177,7 +177,7 @@ class RegisterUserTests(TestCase):
         # Update other field than captions
         error_message = 'only allow captions and status'
         response = client.put(
-            BASE_URL + 'photo/' + str(obj_id) + '/',
+            BASE_URL + 'photo/' + str(obj_id),
             {
                 'name': 'sapi bandung',
             },
@@ -188,7 +188,7 @@ class RegisterUserTests(TestCase):
 
         # Bad request
         response = client.put(
-            BASE_URL + 'photo/' + str(obj_id) + '/',
+            BASE_URL + 'photo/' + str(obj_id),
             '{"foo"}',
             format='json'
         )
@@ -214,13 +214,13 @@ class RegisterUserTests(TestCase):
 
         # Delete the photo
         response = client.delete(
-            BASE_URL + 'photo/' + str(obj_id) + '/'
+            BASE_URL + 'photo/' + str(obj_id)
         )
         self.assertIs(status.is_success(response.status_code), True)
 
         # Get deleted photo
         response = client.get(
-            BASE_URL + 'photo/' + str(obj_id) + '/'
+            BASE_URL + 'photo/' + str(obj_id)
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 

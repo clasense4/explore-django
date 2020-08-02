@@ -5,7 +5,7 @@ from photos import views
 
 urlpatterns = [
     path('api/v1/photos', views.PhotoList.as_view()),
-    path('api/v1/photo/<int:pk>/', views.PhotoDetail.as_view()),
+    path('api/v1/photo/<int:pk>', views.PhotoDetail.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
