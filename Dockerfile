@@ -7,3 +7,5 @@ WORKDIR /root/src
 COPY ./src/requirements.txt .
 
 RUN pip install -r requirements.txt
+
+COPY . .
