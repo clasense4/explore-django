@@ -13,7 +13,8 @@ sudo chmod +x /usr/local/bin/docker-compose
 docker --version
 docker-compose --version
 
-cd ~
+cd /home/ubuntu
 git clone https://github.com/clasense4/explore-django.git
 cd explore-django
 sudo docker-compose up -d --build
+sudo docker exec -it explore-django_web_1 python manage.py migrate

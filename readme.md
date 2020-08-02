@@ -59,8 +59,8 @@ python manage.py runserver
 ```
 # Start (with daemon mode add `-d`) or build (add `--build`) the docker images
 docker-compose up --build
-docker exec -it django-photos_web_1 python manage.py migrate
-docker exec -it django-photos_web_1 python manage.py createsuperuser
+docker exec -it explore-django_web_1 python manage.py migrate
+docker exec -it explore-django_web_1 python manage.py createsuperuser
 ```
 
 The docker environment is supported for auto reload.
@@ -110,7 +110,7 @@ On docker running, use the commands below
 
 ```
 # Execute test inside docker
-docker exec -it django-photos_web_1 python manage.py test photos
+docker exec -it explore-django_web_1 python manage.py test photos
 ```
 
 ## API
