@@ -4,15 +4,15 @@ services:
   web:
     restart: always
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn djangophotos.wsgi:application -w 2 -b :8000 --reload
     depends_on:
       - db
     volumes:
       - ./src/:/root/src/
     ports:
-      - 8000:8000
+      - 80:8000
     env_file:
-      - ./src/.env.dev
+      - ./src/.env.prod
   db:
     image: postgres:12.2
     volumes:
