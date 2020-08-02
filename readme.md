@@ -268,8 +268,16 @@ curl -X GET \
 
 ## Production
 
+We can use terraform to create an ec2 instance and use the init script to do the configuration.
+
+```
+cd infra
+terraform plan
+terraform apply -auto-approve
+```
+
 ## TODO
 
 1. Add batch operations
 2. Add Swagger output support using [dry-yasg](https://github.com/axnsan12/drf-yasg)
-
+3. Fix static files problem on prod / debug is disabled
