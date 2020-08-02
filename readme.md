@@ -14,7 +14,6 @@ A simple django application to manage photos
 - JWT authentication
 - Remove the dimension/size limit, and store the original photo, but serve only proportional
 - Resized/cropped photos based on pre-defined dimensions
-- Implement batch upload, edit, delete, publish API for photos
 - Support #tags in captions, and filtering on the same
 
 
@@ -25,8 +24,6 @@ A simple django application to manage photos
 3. Docker compose 1.25.4
 
 ### Development
-
-This step is required for enabling code completion on vscode. Can skip if not needed.
 
 ```
 # Check python version, required 3.8.5
@@ -42,17 +39,25 @@ pip install -r src/requirements.txt
 
 # Import environment variables
 cd src
-export $(cat .env.dev | xargs)
+export $(cat .env.local | xargs)
+
+# Uncomment the `web` service on the `docker-compose.yml`
+# So the compose only running the `db` service
+docker-compose up --build
 
 # Test django installation
+python manage.py migrate
+python manage.py createsuperuser
 python manage.py runserver
 ```
 
-Now the local is fine, let's prepare for a dockerize environment.
+### Development with Docker
 
 ```
 # Start (with daemon mode add `-d`) or build (add `--build`) the docker images
-docker-compose up
+docker-compose up --build
+docker exec -it django-photos_web_1 python manage.py migrate
+docker exec -it django-photos_web_1 python manage.py createsuperuser
 ```
 
 The docker environment is supported for auto reload.
@@ -62,40 +67,12 @@ The docker environment is supported for auto reload.
 On local, use the commands below
 
 ```
-cd src && python manage.py test photos
+cd src && coverage run --source='.' manage.py test photos/tests && coverage html
 ```
 
 On docker running, use the commands below
 
 ```
-# Check docker name
-$(docker ps | grep django | awk '{print $12}')
 # Execute test inside docker
-docker exec -it $(docker ps | grep django | awk '{print $12}') python manage.py test photos
-```
-
-## API
-
-### Photo
-
-> All endpoint need to be authenticated using jwt
-
-```
-POST /auth
-return access_token & refresh_token
-
-GET /photos
-    /photos/{id}
-    /photos/me
-    /photos/drafts
-    /photos/draft/{id}
-
-POST /photos -> able to publish directly or save as draft
-return id
-
-POST /photos/draft
-return id
-
-DELETE /photos/{id}
-return id
+docker exec -it django-photos_web_1 python manage.py test photos
 ```
