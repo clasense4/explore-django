@@ -19,3 +19,10 @@ class PhotoSerializer(serializers.ModelSerializer):
         model = Photo
         fields = '__all__'
 
+
+class UserPhotoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Photo
+        fields = ['id', 'name', 'captions', 'file', 'published_at']
+

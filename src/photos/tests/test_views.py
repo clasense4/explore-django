@@ -8,7 +8,7 @@ client = APIClient()
 BASE_URL = '/api/v1/'
 
 
-class RegisterUserTests(TestCase):
+class PhotoTests(TestCase):
     user_token = ''
 
     def setUp(self):

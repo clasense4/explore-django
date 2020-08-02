@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views.decorators.csrf import csrf_exempt
 from photos.models import Photo
-from photos.serializers import PhotoSerializer
+from django.contrib.auth.models import User
+from photos.serializers import PhotoSerializer, UserPhotoSerializer
 from rest_framework import permissions
 from photos.permissions import IsOwner
 from django.http import Http404
@@ -98,3 +99,27 @@ class PhotoDetail(APIView):
         Photo.delete()
         # Delete media?
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserList(APIView):
+    """
+    List all published photos by user.
+    """
+    permission_classes = [
+        permissions.IsAuthenticatedOrReadOnly
+    ]
+
+    def get_object(self, username):
+        try:
+            obj = get_object_or_404(User, username=username)
+            self.check_object_permissions(self.request, obj)
+            return obj
+        except User.DoesNotExist:
+            raise Http404
+
+    def get(self, request, username, format=None):
+        # Validate username
+        user = self.get_object(username)
+        user_photos = Photo.objects.filter(user=user.id, status='p')
+        serializer = UserPhotoSerializer(user_photos, many=True, context={'request': request})
+        return Response(serializer.data)
