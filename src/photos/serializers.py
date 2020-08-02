@@ -21,8 +21,11 @@ class PhotoSerializer(serializers.ModelSerializer):
 
 
 class UserPhotoSerializer(serializers.ModelSerializer):
+    image_small = serializers.ImageField(read_only=True)
+    image_medium = serializers.ImageField(read_only=True)
+    image_large = serializers.ImageField(read_only=True)
 
     class Meta:
         model = Photo
-        fields = ['id', 'name', 'captions', 'file', 'published_at']
+        fields = ['id', 'name', 'captions', 'image_small', 'image_medium', 'image_large', 'published_at']
 
