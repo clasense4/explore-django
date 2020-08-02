@@ -16,10 +16,13 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 class PhotoSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.id')
+    image_small = serializers.ImageField(read_only=True)
+    image_medium = serializers.ImageField(read_only=True)
+    image_large = serializers.ImageField(read_only=True)
 
     class Meta:
         model = Photo
-        fields = '__all__'
+        exclude = ['file']
 
 
 class UserPhotoSerializer(serializers.ModelSerializer):
