@@ -1,6 +1,6 @@
 # Django Photos
 
-A simple django application to manage photos
+A simple django application to manage photos. Using Python 3.8.5, Django 3.0.8, Django REST Framework (also few django package) and PostgreSQL 12.2.
 
 ## Features
 
@@ -17,14 +17,16 @@ A simple django application to manage photos
 - Support #tags in captions, and filtering on the same
 
 
-## Requirement
+## Installation and development mode
+
+### Requirements
 
 1. Python 3.8.5 with virtualenv, can be installed using [pyenv](https://github.com/pyenv/pyenv)
 2. Docker 18.09.5
 3. Docker compose 1.25.4
 4. [jq](https://stedolan.github.io/jq/)
 
-### Development
+### Installation & local development
 
 ```
 # Check python version, required 3.8.5
@@ -192,3 +194,82 @@ curl -X GET \
   -H "Authorization: JWT ${USER_TOKEN}" | jq -r "."
 
 ```
+
+### Update photo caption and status
+
+We can also update the individual resources captions and status. Update the status to draft to disable it from hashtag searching.
+
+```
+curl -X PUT \
+  http://localhost:8000/api/v1/photo/1 \
+  -H "Authorization: JWT ${USER_TOKEN}" \
+  -F captions="Nemo Aquarium #ikan #nemo #aquarium #saltwater #fishtank" \
+  | jq -r "."
+
+curl -X PUT \
+  http://localhost:8000/api/v1/photo/3 \
+  -H "Authorization: JWT ${USER_TOKEN}" \
+  -F status=p \
+  | jq -r "."
+
+curl -X PUT \
+  http://localhost:8000/api/v1/photo/2 \
+  -H "Authorization: JWT ${USER_TOKEN}" \
+  -F status=d \
+  | jq -r "."
+```
+
+### Delete photo
+
+The current implementation of this endpoint is only delete the database record, not yet removing the media.
+
+```
+curl -X DELETE \
+  http://localhost:8000/api/v1/photo/2 \
+  -H "Authorization: JWT ${USER_TOKEN}" \
+  | jq -r "."
+```
+
+### Filter photo by user
+
+We can filter the photos by user with status published. The structure is a bit different than our previous endpoint. Because any authenticated user can call this endpoint, so we want to hide private information like `created_at` and `user`. You can also try to hit this endpoint using another user token.
+
+```
+curl -X GET \
+  http://localhost:8000/api/v1/user/fajri2 \
+  -H "Authorization: JWT ${USER_TOKEN}" | jq -r "."
+```
+
+### Filter photo by hashtag
+
+Any authenticated user can hit this endpoint.
+
+```
+curl -X POST \
+  http://localhost:8000/api/v1/photos/hashtag \
+  -H "Authorization: JWT ${USER_TOKEN}" \
+  -H "content-type: application/json" \
+  -d '{"search":"#nemo"}' | jq -r "."
+```
+
+### Photo can only accessed by its owner
+
+Open new terminal console session and register another user. And try to hit the resource from another user.
+
+```
+curl -X GET \
+  http://localhost:8000/api/v1/photo/1 \
+  -H "Authorization: JWT ${USER_TOKEN}" | jq -r "."
+
+{
+  "detail": "You do not have permission to perform this action."
+}
+```
+
+## Production
+
+## TODO
+
+1. Add batch operations
+2. Add Swagger output support using [dry-yasg](https://github.com/axnsan12/drf-yasg)
+
