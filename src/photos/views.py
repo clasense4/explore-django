@@ -8,6 +8,7 @@ from rest_framework import permissions
 from photos.permissions import IsOwner
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 
 class PhotoList(APIView):
@@ -33,7 +34,13 @@ class PhotoList(APIView):
         photo_serializer = PhotoSerializer(data=request.data, context={'request': request})
 
         if photo_serializer.is_valid():
-            photo_serializer.save(user=self.request.user)
+            # Add published_at if status=p
+            if request.data['status'] == 'p':
+                photo_serializer.save(
+                    user=self.request.user, published_at=timezone.now()
+                )
+            else:
+                photo_serializer.save(user=self.request.user)
             return Response(photo_serializer.data, status=status.HTTP_201_CREATED)
         return Response(photo_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -64,11 +71,15 @@ class PhotoDetail(APIView):
         photo = self.get_object(pk)
         serializer = PhotoSerializer(photo, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
-            # Only allow update captions
-            allowed_field = ('captions','status')
-            # if 'captions' in request.data:
-            if all(field in allowed_field for field in request.data):
+            # Only allow update captions and status from draft to publish
+            if 'captions' in request.data:
                 serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            elif 'status' in request.data:
+                if request.data['status'] == 'p':
+                    serializer.save(published_at=timezone.now())
+                else:
+                    serializer.save()
                 return Response(serializer.data, status=status.HTTP_200_OK)
             else:
                 return Response({'error': 'only allow captions and status'}, status=status.HTTP_400_BAD_REQUEST)

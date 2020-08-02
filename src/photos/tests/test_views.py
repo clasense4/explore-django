@@ -133,7 +133,9 @@ class RegisterUserTests(TestCase):
                 format='multipart'
             )
         obj_id = response.data['id']
+        photo_status = response.data['published_at']
         self.assertIs(status.is_success(response.status_code), True)
+        self.assertNotEqual(photo_status, None)
 
         # Update the captions
         captions = 'Sapi bandung #sapi'
@@ -147,7 +149,7 @@ class RegisterUserTests(TestCase):
         self.assertIs(status.is_success(response.status_code), True)
         self.assertEqual(captions, response.data['captions'])
 
-        # Publish from draft
+        # Update photo status to draft
         photo_status = 'd' #draft
         response = client.put(
             BASE_URL + 'photo/' + str(obj_id),
@@ -160,7 +162,7 @@ class RegisterUserTests(TestCase):
         self.assertEqual(photo_status, response.data['status'])
 
         # Update captions and publish status
-        photo_status = 'p' #draft
+        photo_status = 'p' #published
         captions = 'Sapi bandung juara #sapi #juara'
         response = client.put(
             BASE_URL + 'photo/' + str(obj_id),
