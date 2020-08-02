@@ -7,8 +7,8 @@ from rest_framework.test import APIClient
 client = APIClient()
 BASE_URL = '/api/v1/'
 
-class RegisterUserTests(TestCase):
 
+class RegisterUserTests(TestCase):
     user_token = ''
 
     def setUp(self):
@@ -56,7 +56,9 @@ class RegisterUserTests(TestCase):
                 format='multipart'
             )
         obj_id = response.data['id']
+        published_at = response.data['published_at']
         self.assertIs(status.is_success(response.status_code), True)
+        self.assertNotEqual(published_at, None)
 
         # Get all photo
         response = client.get(
@@ -88,10 +90,21 @@ class RegisterUserTests(TestCase):
                 format='multipart'
             )
         obj_id = response.data['id']
+        published_at = response.data['published_at']
         self.assertIs(status.is_success(response.status_code), True)
+        self.assertEqual(published_at, None)
 
-        # TODO: Get all photo with status draft with query string
-        # TODO: Get individual photo
+        # Update photo status to published
+        photo_status = 'p' #published
+        response = client.put(
+            BASE_URL + 'photo/' + str(obj_id),
+            {
+                'status': photo_status,
+            },
+            format='json'
+        )
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertEqual(photo_status, response.data['status'])
 
     def test_04_bad_request_post(self):
         # Post a bad request photo
@@ -225,7 +238,6 @@ class RegisterUserTests(TestCase):
             BASE_URL + 'photo/' + str(obj_id)
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
-
 
     def test_08_get_filter_query_params(self):
         # Create client
