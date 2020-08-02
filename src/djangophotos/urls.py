@@ -25,9 +25,6 @@ from rest_framework_jwt.views import obtain_jwt_token
 urlpatterns = [
     path('', include('photos.urls')),
     path('admin/', admin.site.urls),
-    # url(r'^', include(router.urls)),
-    # url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    # path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^api-token-auth/', obtain_jwt_token),
     path('', include('rest_auth.urls')),
     path('registration/', include('rest_auth.registration.urls')),
