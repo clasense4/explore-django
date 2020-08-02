@@ -10,7 +10,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 
 
-
 class PhotoList(APIView):
     """
     List all photos, or create a new photo.
@@ -21,7 +20,12 @@ class PhotoList(APIView):
     ]
 
     def get(self, request, format=None):
-        photos = Photo.objects.filter(user=request.user.id)
+        # Filter by query params | ?status=p
+        photo_status = request.query_params.get('status', None)
+        if photo_status:
+            photos = Photo.objects.filter(user=request.user.id, status=photo_status)
+        else:
+            photos = Photo.objects.filter(user=request.user.id)
         photo_serializer = PhotoSerializer(photos, many=True, context={'request': request})
         return Response(photo_serializer.data, status=status.HTTP_200_OK)
 

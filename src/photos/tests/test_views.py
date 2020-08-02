@@ -34,7 +34,7 @@ class RegisterUserTests(TestCase):
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
         response = client.get(
-            BASE_URL + 'photo/'
+            BASE_URL + 'photos'
         )
         photo_count = len(response.data)
         self.assertIs(status.is_success(response.status_code), True)
@@ -46,7 +46,7 @@ class RegisterUserTests(TestCase):
         client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
         with open('photos/tests/sapi.jpg', 'rb') as fp:
             response = client.post(
-                BASE_URL + 'photo/',
+                BASE_URL + 'photos',
                 {
                     'name': 'sapi australia',
                     'file': fp,
@@ -60,7 +60,7 @@ class RegisterUserTests(TestCase):
 
         # Get all photo
         response = client.get(
-            BASE_URL + 'photo/'
+            BASE_URL + 'photos'
         )
         photo_count = len(response.data)
         self.assertIs(status.is_success(response.status_code), True)
@@ -78,7 +78,7 @@ class RegisterUserTests(TestCase):
         client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
         with open('photos/tests/sapi.jpg', 'rb') as fp:
             response = client.post(
-                BASE_URL + 'photo/',
+                BASE_URL + 'photos',
                 {
                     'name': 'sapi australia',
                     'file': fp,
@@ -99,7 +99,7 @@ class RegisterUserTests(TestCase):
         client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
         with open('photos/tests/sapi.jpg', 'rb') as fp:
             response = client.post(
-                BASE_URL + 'photo/',
+                BASE_URL + 'photos',
                 {
                     'file': fp,
                     'captions': 'Sapi australia #sapi',
@@ -123,7 +123,7 @@ class RegisterUserTests(TestCase):
         client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
         with open('photos/tests/sapi.jpg', 'rb') as fp:
             response = client.post(
-                BASE_URL + 'photo/',
+                BASE_URL + 'photos',
                 {
                     'name': 'sapi australia',
                     'file': fp,
@@ -200,7 +200,7 @@ class RegisterUserTests(TestCase):
         client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
         with open('photos/tests/sapi.jpg', 'rb') as fp:
             response = client.post(
-                BASE_URL + 'photo/',
+                BASE_URL + 'photos',
                 {
                     'name': 'sapi australia',
                     'file': fp,
@@ -223,3 +223,63 @@ class RegisterUserTests(TestCase):
             BASE_URL + 'photo/' + str(obj_id) + '/'
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+    def test_08_get_filter_query_params(self):
+        # Create client
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
+
+        # New published photo
+        with open('photos/tests/sapi.jpg', 'rb') as fp:
+            response = client.post(
+                BASE_URL + 'photos',
+                {
+                    'name': 'sapi australia published',
+                    'file': fp,
+                    'captions': 'Sapi australia #sapi',
+                    'status': 'p',
+                },
+                format='multipart'
+            )
+        obj_id_published = response.data['id']
+        self.assertIs(status.is_success(response.status_code), True)
+
+        # New draft photo
+        with open('photos/tests/sapi.jpg', 'rb') as fp:
+            response = client.post(
+                BASE_URL + 'photos',
+                {
+                    'name': 'sapi australia draft',
+                    'file': fp,
+                    'captions': 'Sapi australia #sapi',
+                    'status': 'd',
+                },
+                format='multipart'
+            )
+        draft_obj_id = response.data['id']
+        self.assertIs(status.is_success(response.status_code), True)
+
+        # Get all photos, must return 2 records
+        response = client.get(
+            BASE_URL + 'photos'
+        )
+        photo_count = len(response.data)
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertIs(photo_count, 2)
+
+        # Get all published photo, must return 1 record
+        response = client.get(
+            BASE_URL + 'photos?status=p'
+        )
+        photo_count = len(response.data)
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertIs(photo_count, 1)
+
+        # Get all photos, must return 1 record
+        response = client.get(
+            BASE_URL + 'photos?status=d'
+        )
+        photo_count = len(response.data)
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertIs(photo_count, 1)
