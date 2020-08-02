@@ -117,7 +117,7 @@ class RegisterUserTests(TestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_06_update_captions(self):
+    def test_06_update_captions_and_status(self):
         # Post a new published photo
         client = APIClient()
         client.credentials(HTTP_AUTHORIZATION='JWT ' + self.user_token)
@@ -147,8 +147,35 @@ class RegisterUserTests(TestCase):
         self.assertIs(status.is_success(response.status_code), True)
         self.assertEqual(captions, response.data['captions'])
 
+        # Publish from draft
+        photo_status = 'd' #draft
+        response = client.put(
+            BASE_URL + 'photo/' + str(obj_id) + '/',
+            {
+                'status': photo_status,
+            },
+            format='json'
+        )
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertEqual(photo_status, response.data['status'])
+
+        # Update captions and publish status
+        photo_status = 'p' #draft
+        captions = 'Sapi bandung juara #sapi #juara'
+        response = client.put(
+            BASE_URL + 'photo/' + str(obj_id) + '/',
+            {
+                'captions': captions,
+                'status': photo_status,
+            },
+            format='json'
+        )
+        self.assertIs(status.is_success(response.status_code), True)
+        self.assertEqual(photo_status, response.data['status'])
+        self.assertEqual(captions, response.data['captions'])
+
         # Update other field than captions
-        error_message = 'only allow captions'
+        error_message = 'only allow captions and status'
         response = client.put(
             BASE_URL + 'photo/' + str(obj_id) + '/',
             {
